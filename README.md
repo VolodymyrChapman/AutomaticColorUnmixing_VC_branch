@@ -1,4 +1,12 @@
 # Automatic Color Unmixing #
+
+## Background:
+This repository is a public clone of computationalpathologygroup/AutomaticColorUnmixing by Daan Geijs at the University of Radboud Medical Centre, Computational Pathology Group.
+The purpose of this fork is for generalisation of the methods to a range of systems with a focus on using existing libraries.
+
+If using this repository in work, please cite Daan's work:
+D. J. Geijs, M. Intezar, J. A. W. M. van der Laak, and G. J. S. Litjens "Automatic color unmixing of IHC stained whole slide images", Proc. SPIE 10581, Medical Imaging 2018: Digital Pathology, 105810L (6 March 2018); https://doi.org/10.1117/12.2293734 
+
 ## 1. Run 'get_stain_matrix.py' to retrieve the clusters and the stain_matrix for the color deconvolution. 
 **Single file mode**
 ```
