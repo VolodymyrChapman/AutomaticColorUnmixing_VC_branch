@@ -1,7 +1,10 @@
 import math
 import os
 
-import digitalpathology.image.io.imagereader as dptimagereader
+# import digitalpathology.image.io.imagereader as dptimagereader
+# try to replace departmental io with skimage.io.imread
+from skimage import io as dptimagereader
+
 import matplotlib.pyplot as plt
 import numpy as np
 import sklearn.cluster as km
@@ -157,7 +160,9 @@ class DetermineStains(object):
             stain_info.all_dist.append(np.nan)
             stain_info.all_clusters.append(np.nan)
             stain_info.tile_coords.append(np.nan)
+    
 
+    #### Need to modify this to use np arrays as image inputs instead of dep. read functions
     def search_stain(self,
                      color_augmenter=None,
                      affix_stain="cxcy.png",
@@ -247,12 +252,14 @@ class DetermineStains(object):
         if self.verbose:
             tqdm.write("\nProcessing: {}".format(self.filename))
 
-        self.img_obj = dptimagereader.ImageReader(input_image_path.__str__())
-        self.mask_obj = dptimagereader.ImageReader(mask_image_path.__str__()) if mask_image_path else None
+        self.img_obj = dptimagereader.imread(input_image_path.__str__())
+        self.mask_obj = dptimagereader.imread(mask_image_path.__str__()) if mask_image_path else None
 
         # self.dim_y, self.dim_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings, self.spacing, atol=4.0 * 0.25))[0][0]]
-        self.dim_y, self.dim_x = self.img_obj.shapes[
-            np.where(np.isclose(self.img_obj.spacings, self.spacing, atol=self.spacing * 0.25))[0][0]]
+        # self.dim_y, self.dim_x,_ = self.img_obj.shapes[
+        #     np.where(np.isclose(self.img_obj.spacings, self.spacing, atol=self.spacing * 0.25))[0][0]]
+
+        self.dim_y, self.dim_x,_ = self.img_obj.shape
 
         # Find org stain without color aug.
         #
