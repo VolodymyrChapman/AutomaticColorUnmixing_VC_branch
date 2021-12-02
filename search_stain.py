@@ -1,9 +1,11 @@
 import math
 import os
 
+# original line:
 # import digitalpathology.image.io.imagereader as dptimagereader
-# try to replace departmental io with skimage.io.imread
-from skimage import io as dptimagereader
+
+# replace departmental io with skimage.io.imread
+from skimage import io
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -270,8 +272,8 @@ class DetermineStains(object):
         if self.verbose:
             tqdm.write("\nProcessing: {}".format(self.filename))
 
-        self.img_obj = dptimagereader.imread(input_image_path.__str__())
-        self.mask_obj = dptimagereader.imread(mask_image_path.__str__()) if mask_image_path else None
+        self.img_obj = io.imread(input_image_path.__str__())
+        self.mask_obj = io.imread(mask_image_path.__str__()) if mask_image_path else None
 
         # self.dim_y, self.dim_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings, self.spacing, atol=4.0 * 0.25))[0][0]]
         # self.dim_y, self.dim_x,_ = self.img_obj.shapes[

@@ -5,8 +5,13 @@ import time
 import numpy as np
 from skimage.util.dtype import img_as_float
 import cv2
+
+# original lines:
+# import multiresolutionimageinterface as mir
+# import digitalpathology.image.io.imagereader as dptimagereader
+
 import multiresolutionimageinterface as mir
-import digitalpathology.image.io.imagereader as dptimagereader
+from skimage import io as dptimagereader # remember to replace with io throughout file
 
 #----------------------------------------------------------------------------------------------------
 
