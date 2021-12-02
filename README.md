@@ -5,10 +5,12 @@ This repository is a public clone of computationalpathologygroup/AutomaticColorU
 The purpose of this fork is for conversion of all dependencies to openly available / easy to install via conda libraries. 
 
 Files converted to date:
+- get_stain_matrix.py (no dependency changes needed)
+- apply_color_deconv.py (no dependency changes needed)
 - search_stain.py (all dependencies on digitalpathology library converted to numpy)
-- deconvolve_image.py (conversion away from use of multiresolutioninterface / ASAP in progress)
+- deconvolve_image.py (conversion away from use of multiresolutioninterface / ASAP and digitalpathology libraries in progress)
 
-If using this repository in work, please cite Daan's work:
+If using this repository, please cite Daan's work:
 
 D. J. Geijs, M. Intezar, J. A. W. M. van der Laak, and G. J. S. Litjens "Automatic color unmixing of IHC stained whole slide images", Proc. SPIE 10581, Medical Imaging 2018: Digital Pathology, 105810L (6 March 2018); https://doi.org/10.1117/12.2293734 
 
