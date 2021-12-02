@@ -2,13 +2,13 @@
 
 ## Background:
 This repository is a public clone of computationalpathologygroup/AutomaticColorUnmixing by Daan Geijs at the University of Radboud Medical Centre, Computational Pathology Group.
-The purpose of this fork is for conversion of all dependencies to openly available / easy to install via conda libraries. 
+The purpose of this fork is for conversion of all dependencies to openly available / easy to install via conda libraries. Retrieval of stain matrices and deconvolution of non-WSI images has been confirmed working using the included conda environment on Ubuntu 20.04. 
 
-Files converted to date:
+Conversion progress to date:
 - get_stain_matrix.py (no dependency changes needed)
 - apply_color_deconv.py (no dependency changes needed)
 - search_stain.py (all dependencies on digitalpathology library converted to numpy)
-- deconvolve_image.py (conversion away from use of multiresolutioninterface / ASAP and digitalpathology libraries in progress)
+- deconvolve_image.py (conversion away from use of multiresolutioninterface / ASAP and digitalpathology libraries)
 
 If using this repository, please cite Daan's work:
 
