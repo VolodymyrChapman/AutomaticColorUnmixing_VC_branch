@@ -164,7 +164,7 @@ class DetermineStains(object):
 
     #### Need to modify this to use np arrays as image inputs instead of dep. read functions
     def search_stain(self,
-                     color_augmenter=None,
+                    #  color_augmenter=None,
                      affix_stain="cxcy.png",
                      affix_thumbnail='overlay.png'):
 
@@ -175,27 +175,40 @@ class DetermineStains(object):
         stain_info = StainInfo(tile_coords, all_dist, all_clusters)
         if self.verbose:
             print('\nSearching stains...')
+
         with tqdm(total=int(math.floor(self.dim_y / self.patch_size) * math.floor(self.dim_x / self.patch_size)),
                   desc='Progress', unit='tile', disable=1 - self.verbose + self.multi_processing) as pbar:
+            
+            # Split into patches acrosss y
             for y_index in range(0, self.dim_y, self.patch_size):
+                # Split into patches acrosss x
                 for x_index in range(0, self.dim_x, self.patch_size):
-
+                    
+                    # Stop once patch extends past dimensions of image
                     if x_index + self.patch_size > self.dim_x or y_index + self.patch_size > self.dim_y:
                         # pbar.update(1)
                         continue
-
+                    
+                    # Read relevant region of mask object or initialise mask tile
                     if self.mask_obj:
-                        mask_tile = self.mask_obj.read(self.spacing, y_index, x_index, self.patch_size, self.patch_size)
+                        # mask_tile = self.mask_obj.read(self.spacing, y_index, x_index, self.patch_size, self.patch_size)
+                        
+                        # As above but np implementation
+                        mask_tile = self.mask_obj[y_index:y_index + self.patch_size, x_index: x_index + self.patch_size, :]
 
                     else:
                         mask_tile = np.ones((self.patch_size, self.patch_size, 1))
 
                     if np.any(mask_tile):
-                        tile = self.img_obj.read(self.spacing,
-                                                 y_index,
-                                                 x_index,
-                                                 self.patch_size,
-                                                 self.patch_size)
+                        # Slice relevant region of image tile
+                        # tile = self.img_obj.read(self.spacing,
+                        #                          y_index,
+                        #                          x_index,
+                        #                          self.patch_size,
+                        #                          self.patch_size)
+                       
+                        # As above but np implementation
+                        tile = self.img_obj[y_index:y_index + self.patch_size, x_index: x_index + self.patch_size, :]
 
                         tile[mask_tile.squeeze() == 0] = [254, 254, 254]
 
