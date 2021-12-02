@@ -2,7 +2,11 @@
 
 ## Background:
 This repository is a public clone of computationalpathologygroup/AutomaticColorUnmixing by Daan Geijs at the University of Radboud Medical Centre, Computational Pathology Group.
-The purpose of this fork is for generalisation of the methods to a range of systems with a focus on using existing libraries.
+The purpose of this fork is for conversion of all dependencies to openly available / easy to install via conda libraries. 
+
+Files converted to date:
+- search_stain.py (all dependencies on digitalpathology library converted to numpy)
+- deconvolve_image.py (conversion away from use of multiresolutioninterface / ASAP in progress)
 
 If using this repository in work, please cite Daan's work:
 

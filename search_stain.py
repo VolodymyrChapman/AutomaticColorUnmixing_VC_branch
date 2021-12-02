@@ -99,13 +99,13 @@ class DetermineStains(object):
         fig.savefig(os.path.join(self.figure_path.format(image=self.filename), affix_stain))
         plt.close()
 
-    def get_ratio(self, spacing_a, spacing_b):
-        down_sample_index_a = np.where(np.isclose(self.img_obj.spacings, spacing_a, atol=spacing_a * 0.25))[0][0]
-        down_sample_index_b = np.where(np.isclose(self.img_obj.spacings, spacing_b, atol=spacing_b * 0.25))[0][0]
+    # def get_ratio(self, spacing_a, spacing_b):
+    #     # down_sample_index_a = np.where(np.isclose(self.img_obj.size[0], spacing_a, atol=spacing_a * 0.25))[0][0]
+    #     # down_sample_index_b = np.where(np.isclose(self.img_obj.size[1], spacing_b, atol=spacing_b * 0.25))[0][0]
 
-        ratio = self.img_obj.downsamplings[down_sample_index_a] / self.img_obj.downsamplings[down_sample_index_b]
+    #     # ratio = self.img_obj.downsamplings[down_sample_index_a] / self.img_obj.downsamplings[down_sample_index_b]
 
-        return ratio
+    #     return ratio
 
     def plot_thumbnail(self, stain_info, patch_numbers, affix_thumbnail):
         if self.verbose:
@@ -113,16 +113,21 @@ class DetermineStains(object):
 
         projection_level = 8.0
 
-        dimension_y, dimension_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings,
-                                                                           projection_level,
-                                                                           atol=projection_level * 0.25))[0][0]]
+        # dimension_y, dimension_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings,
+        #                                                                    projection_level,
+        #                                                                    atol=projection_level * 0.25))[0][0]]
+        dimension_y, dimension_x, _ = self.img_obj.shape
 
-        full_image = self.img_obj.read(projection_level, 0, 0, dimension_y, dimension_x)
+        full_image = self.img_obj
         rgb_mask = np.zeros([dimension_y, dimension_x])
         tile_spots = np.array([stain_info.tile_coords[i] for i in patch_numbers])
+        
+        # If WSIs used with certain downsampling:
+        # ratio = self.get_ratio(self.spacing, projection_level)
 
-        ratio = self.get_ratio(self.spacing, projection_level)
-
+        # if non-downsampled (1x) tiles used as input instead
+        ratio = 1 
+        
         # draw stuff
         # with tqdm(total=len(tile_spots),
         #           desc='Progress', unit='tile', disable=self.use_tqdm) as pbar:
