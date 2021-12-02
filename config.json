@@ -2,7 +2,7 @@
     "search_stain": {
         "spacing": 2.0,
         "threshold": 240,
-        "percentile": 98,
+        "percentile": 50,
         "OD_threshold": 0.25,
         "patch_size": 256,
         "apply_color_aug": 0,
@@ -19,7 +19,7 @@
     "deconvolve_image":  {
         "spacing"          : 0.5,
         "number_of_stains" : 3,
-        "step_size"        : 2048,
+        "step_size"        : 100,
         "max_method"       : "gaussian",
         "verbose"          : 1
     }

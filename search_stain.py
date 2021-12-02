@@ -113,8 +113,6 @@ class DetermineStains(object):
         if self.verbose:
             print('Plotting thumbnail...')
 
-        projection_level = 8.0
-
         # dimension_y, dimension_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings,
         #                                                                    projection_level,
         #                                                                    atol=projection_level * 0.25))[0][0]]
@@ -125,10 +123,11 @@ class DetermineStains(object):
         tile_spots = np.array([stain_info.tile_coords[i] for i in patch_numbers])
         
         # If WSIs used with certain downsampling:
+        # projection_level = 8.0
         # ratio = self.get_ratio(self.spacing, projection_level)
 
         # if non-downsampled (1x) tiles used as input instead
-        ratio = 1 
+        ratio = dimension_y / self.patch_size
         
         # draw stuff
         # with tqdm(total=len(tile_spots),
@@ -190,6 +189,9 @@ class DetermineStains(object):
             for y_index in range(0, self.dim_y, self.patch_size):
                 # Split into patches acrosss x
                 for x_index in range(0, self.dim_x, self.patch_size):
+
+                    # Sanity check that all tiles being processed
+                    # print(f'x_index = {x_index}; y_index = {y_index}')
                     
                     # Stop once patch extends past dimensions of image
                     if x_index + self.patch_size > self.dim_x or y_index + self.patch_size > self.dim_y:
@@ -228,8 +230,8 @@ class DetermineStains(object):
         # Select ROI
         #
         if np.any(~np.isnan(stain_info.all_dist)):
-            perc95 = np.percentile(np.array(stain_info.all_dist)[~np.isnan(stain_info.all_dist)], [self.percentile])
-            patch_numbers = [i for i, x in enumerate(stain_info.all_dist) if ~np.isnan(x) and x > perc95]
+            perc_n = np.percentile(np.array(stain_info.all_dist)[~np.isnan(stain_info.all_dist)], [self.percentile])
+            patch_numbers = [i for i, x in enumerate(stain_info.all_dist) if ~np.isnan(x) and x > perc_n]
             roi_cluster = np.array([stain_info.all_clusters[i] for i in patch_numbers])
 
             # Select median values of all region of interest values as color

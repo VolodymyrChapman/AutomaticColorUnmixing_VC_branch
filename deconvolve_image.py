@@ -10,8 +10,7 @@ import cv2
 # import multiresolutionimageinterface as mir
 # import digitalpathology.image.io.imagereader as dptimagereader
 
-import multiresolutionimageinterface as mir
-from skimage import io as dptimagereader # remember to replace with io throughout file
+from skimage import io
 
 #----------------------------------------------------------------------------------------------------
 
@@ -24,9 +23,7 @@ class DeconvolveImage(object):
         self.stepsize = config['step_size']
         self.workdir = config['work_dir']
         self.max_method = config['max_method']
-                                 
-        # TODO: We have to change the compression type to LZW if this is not 3, otherwise we get an tile artifact
-        #
+ 
         assert self.number_of_stains == 3
         assert self.max_method in ['gaussian', 'tile_percentile', 'max']
 
@@ -56,47 +53,50 @@ class DeconvolveImage(object):
         Args:
             output_path (str): [description]
         """
+        print(self.result_array.shape)
+        io.imsave(f'{output_path}_0.tiff', self.result_array[:,:,0])
+        io.imsave(f'{output_path}_1.tiff', self.result_array[:,:,1])
+        io.imsave(f'{output_path}_2.tiff', self.result_array[:,:,2])
+        # tile_size = 512 #fixed this value, because it's the fastest tile size for loading 
+        # output_spacing = self.img_obj.spacings[np.where(np.isclose(self.img_obj.spacings, 
+        #                                                            self.spacing, 
+        #                                                            atol=self.spacing*0.25))[0][0]]
 
-        tile_size = 512 #fixed this value, because it's the fasted tile size for loading 
-        output_spacing = self.img_obj.spacings[np.where(np.isclose(self.img_obj.spacings, 
-                                                                   self.spacing, 
-                                                                   atol=self.spacing*0.25))[0][0]]
+        # pixel_size_vec = mir.vector_double()
+        # pixel_size_vec.push_back(output_spacing)
+        # pixel_size_vec.push_back(output_spacing)
 
-        pixel_size_vec = mir.vector_double()
-        pixel_size_vec.push_back(output_spacing)
-        pixel_size_vec.push_back(output_spacing)
+        # writer = mir.MultiResolutionImageWriter()
+        # if self.workdir:
+        #     self.target_output_file = output_path
+        #     Path(output_path).touch()
 
-        writer = mir.MultiResolutionImageWriter()
-        if self.workdir:
-            self.target_output_file = output_path
-            Path(output_path).touch()
+        #     self.local_output_file = os.path.join(self.workdir, self.filename + '.tif')
+        #     writer.openFile(self.local_output_file)
 
-            self.local_output_file = os.path.join(self.workdir, self.filename + '.tif')
-            writer.openFile(self.local_output_file)
-
-        else: 
-            writer.openFile(output_path)
+        # else: 
+        #     writer.openFile(output_path)
                                  
-        writer.setTileSize(tile_size) 
-        writer.setCompression(mir.JPEG)
-        writer.setJPEGQuality(75)
-        writer.setDataType(mir.UChar)
-        writer.setColorType(mir.Indexed)
-        writer.setNumberOfIndexedColors(self.number_of_stains)
-        writer.writeImageInformation(self.dim_x, self.dim_y)
-        writer.setSpacing(pixel_size_vec)
+        # writer.setTileSize(tile_size) 
+        # writer.setCompression(mir.JPEG)
+        # writer.setJPEGQuality(75)
+        # writer.setDataType(mir.UChar)
+        # writer.setColorType(mir.Indexed)
+        # writer.setNumberOfIndexedColors(self.number_of_stains)
+        # writer.writeImageInformation(self.dim_x, self.dim_y)
+        # writer.setSpacing(pixel_size_vec)
 
-        for y_indx in range(0, self.dim_y, tile_size):
-            for x_indx in range(0, self.dim_x, tile_size):
+        # for y_indx in range(0, self.dim_y, tile_size):
+        #     for x_indx in range(0, self.dim_x, tile_size):
 
-                tmp_patch = self.result_array[y_indx:y_indx + tile_size,x_indx:x_indx + tile_size]
-                if np.any(tmp_patch):
-                    writer.writeBaseImagePartToLocation(tmp_patch.flatten().astype(np.uint8), x_indx, y_indx)
+        #         tmp_patch = self.result_array[y_indx:y_indx + tile_size,x_indx:x_indx + tile_size]
+        #         if np.any(tmp_patch):
+        #             writer.writeBaseImagePartToLocation(tmp_patch.flatten().astype(np.uint8), x_indx, y_indx)
 
-        writer.finishImage()                                 
+        # writer.finishImage()                                 
                                  
-        if self.local_output_file: 
-            copyfile(self.local_output_file, self.target_output_file)              
+        # if self.local_output_file: 
+        #     copyfile(self.local_output_file, self.target_output_file)              
 
     @staticmethod
     def color_deconvolution(patch: np.ndarray, inversed_od: np.ndarray) -> np.ndarray:
@@ -143,13 +143,15 @@ class DeconvolveImage(object):
             input_image_path (str): [description]
             mask_image_path (str): [description]
         """
-        self.img_obj = dptimagereader.ImageReader(input_image_path)
-        self.mask_obj = dptimagereader.ImageReader(mask_image_path) if mask_image_path else None        
-        self.dim_y, self.dim_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings, 
-                                                                         self.spacing, 
-                                                                         atol=self.spacing * 0.25))[0][0]]
         
-        self.result_array = np.zeros((self.dim_y, self.dim_x, 3), dtype=np.uint8)    
+        # Read in images
+
+        self.img_obj = io.imread(input_image_path)
+        self.mask_obj = io.imread(mask_image_path) if mask_image_path else None 
+
+        self.dim_y, self.dim_x, _ = self.img_obj.shape
+
+        self.result_array = np.zeros(self.img_obj.shape, dtype=np.uint8)    
 
     def get_processing_patch(self, y_indx: int, x_indx: int) -> list:
         """[summary]
@@ -186,27 +188,14 @@ class DeconvolveImage(object):
                     mask_tile = self.get_mask_patch([patch_coords[0], patch_coords[2], patch_height, patch_width])
 
                     if np.any(mask_tile):
-                        tile = self.img_obj.read(self.spacing,
-                                                 y_indx,
-                                                 x_indx,
-                                                 self.stepsize,
-                                                 self.stepsize)
+                        tile = self.img_obj[y_indx:y_indx + self.stepsize, x_indx:x_indx + self.stepsize, :]
 
                         deconv = self.color_deconvolution(tile, self.inversed_od)
                         self.deconv_max_list.append(deconv.max())
             self.deconv_max = np.percentile(self.deconv_max_list, 95) + 1e-5
                                  
         else:
-            dim_y, dim_x = self.img_obj.shapes[np.where(np.isclose(self.img_obj.spacings, 
-                                                                   4.0, 
-                                                                   atol=4.0 * 0.25))[0][0]]
-
-            patch = self.img_obj.read(4.0, 
-                                      0, 
-                                      0, 
-                                      dim_y, 
-                                      dim_x)
-
+            patch = self.img_obj
             deconv = self.color_deconvolution(patch, self.inversed_od)
             if self.max_method == "gaussian":
                 self.deconv_max = [np.max(cv2.GaussianBlur(deconv[:,:,i], (5, 5), 0)) + 1e-5 for i in range(deconv.shape[-1])]
@@ -225,11 +214,7 @@ class DeconvolveImage(object):
         y_min, x_min, y_max, x_max = coords
         
         if self.mask_obj:
-            mask_tile = self.mask_obj.read(self.spacing, 
-                                           y_min, 
-                                           x_min, 
-                                           y_max, 
-                                           x_max)
+            mask_tile = self.mask_obj[x_min:x_max, y_min:y_max,:]
 
         else:
             mask_tile = np.ones((self.stepsize, self.stepsize, 1))
@@ -249,11 +234,7 @@ class DeconvolveImage(object):
                 mask_tile = self.get_mask_patch([patch_coords[0], patch_coords[2], patch_height, patch_width])
     
                 if np.any(mask_tile):
-                    tile = self.img_obj.read(self.spacing, 
-                                             patch_coords[0], 
-                                             patch_coords[2], 
-                                             patch_height, 
-                                             patch_width)
+                    tile = self.img_obj[patch_coords[0]: patch_coords[1], patch_coords[2]: patch_coords[3],: ]
                     
                     deconv = self.color_deconvolution(tile, self.inversed_od)
                     deconv = deconv * mask_tile
@@ -280,4 +261,3 @@ class DeconvolveImage(object):
         self.apply_deconv()
         self.write_output_tif(output_file.__str__())
         print("Processing took: {}s".format(time.time() - start_time))
-
