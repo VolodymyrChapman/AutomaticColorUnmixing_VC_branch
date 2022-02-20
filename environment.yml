@@ -1,0 +1,17 @@
+name: AutoUnmix
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pip
+  - scikit-image
+  - scikit-learn
+  - matplotlib
+  - numpy
+  - tqdm
+  - pillow
+  - opencv
+  - pip: 
+      - recordclass
+prefix: /home/volodymyr/miniconda3/envs/AutoUnmix
