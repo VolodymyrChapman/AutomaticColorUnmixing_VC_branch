@@ -1,6 +1,4 @@
 .idea/
 *.pyc
-*.png
-*.txt
 
 results3/*
